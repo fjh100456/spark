@@ -15,19 +15,40 @@
  * limitations under the License.
  */
 
-package org.apache.spark.sql.sources.v2;
+package org.apache.spark.unsafe.memory;
 
-import org.apache.spark.annotation.InterfaceStability;
+import javax.annotation.Nullable;
 
 /**
- * An interface for reporting custom metrics from streaming sources and sinks
+ * A memory location. Tracked either by a memory address (with off-heap allocation),
+ * or by an offset from a JVM object (in-heap allocation).
  */
-@InterfaceStability.Evolving
-public interface CustomMetrics {
-  /**
-   * Returns a JSON serialized representation of custom metrics
-   *
-   * @return JSON serialized representation of custom metrics
-   */
-  String json();
+public class MemoryLocation {
+
+  @Nullable
+  Object obj;
+
+  long offset;
+
+  public MemoryLocation(@Nullable Object obj, long offset) {
+    this.obj = obj;
+    this.offset = offset;
+  }
+
+  public MemoryLocation() {
+    this(null, 0);
+  }
+
+  public void setObjAndOffset(Object newObj, long newOffset) {
+    this.obj = newObj;
+    this.offset = newOffset;
+  }
+
+  public final Object getBaseObject() {
+    return obj;
+  }
+
+  public final long getBaseOffset() {
+    return offset;
+  }
 }
